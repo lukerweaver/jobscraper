@@ -20,6 +20,8 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 playwright install chromium
+# Optional: override the Hiring Cafe search URL used by /jobs/hiringcafe
+$env:HIRINGCAFE_SEARCH_URL="https://hiring.cafe/?searchState=..."
 uvicorn app:app --host 0.0.0.0 --port 8000
 ```
 
@@ -34,7 +36,9 @@ docker build -t jobscraper:latest .
 Run container:
 
 ```powershell
-docker run -d --name jobscraper -p 8000:8000 jobscraper:latest
+docker run -d --name jobscraper -p 8000:8000 `
+  -e HIRINGCAFE_SEARCH_URL="https://hiring.cafe/?searchState=..." `
+  jobscraper:latest
 ```
 
 View logs:
@@ -54,6 +58,11 @@ docker rm jobscraper
 
 - `GET /health`
 - `GET /jobs/hiringcafe`
+
+### Environment Variable
+
+- `HIRINGCAFE_SEARCH_URL` (optional): URL opened by Playwright before capturing `/api/search-jobs`.
+- If not set, the service uses the existing default search URL currently hardcoded in `app.py`.
 
 Example:
 

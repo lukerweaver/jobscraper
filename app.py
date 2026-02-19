@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from playwright.async_api import async_playwright
+import os
 from urllib.parse import urlparse
 
 app = FastAPI(title="Hiring Cafe Scraper Service")
@@ -17,7 +18,10 @@ async def jobs():
         page = await context.new_page()
 
         try:
-            search_url = "https://hiring.cafe/?searchState=%7B%22restrictJobsToTransparentSalaries%22%3Atrue%2C%22maxCompensationLowEnd%22%3A%22140000%22%2C%22workplaceTypes%22%3A%5B%22Remote%22%5D%2C%22dateFetchedPastNDays%22%3A2%2C%22sortBy%22%3A%22date%22%2C%22searchQuery%22%3A%22product+manager%22%7D"
+            search_url = os.getenv(
+                "HIRINGCAFE_SEARCH_URL",
+                "https://hiring.cafe/?searchState=%7B%22restrictJobsToTransparentSalaries%22%3Atrue%2C%22maxCompensationLowEnd%22%3A%22140000%22%2C%22workplaceTypes%22%3A%5B%22Remote%22%5D%2C%22dateFetchedPastNDays%22%3A2%2C%22sortBy%22%3A%22date%22%2C%22searchQuery%22%3A%22product+manager%22%7D",
+            )
 
             # Wait for Hiring Cafe's job search API call.
             async with page.expect_response(
