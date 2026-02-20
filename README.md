@@ -20,8 +20,6 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 playwright install chromium
-# Optional: override the Hiring Cafe search URL used by /jobs/hiringcafe
-$env:HIRINGCAFE_SEARCH_URL="https://hiring.cafe/?searchState=..."
 uvicorn app:app --host 0.0.0.0 --port 8000
 ```
 
@@ -37,7 +35,6 @@ Run container:
 
 ```powershell
 docker run -d --name jobscraper -p 8000:8000 `
-  -e HIRINGCAFE_SEARCH_URL="https://hiring.cafe/?searchState=..." `
   jobscraper:latest
 ```
 
@@ -57,47 +54,37 @@ docker rm jobscraper
 ## API
 
 - `GET /health`
-- `GET /jobs/hiringcafe`
+- `GET /jobs/hiringcafe?search_url=<HIRING_CAFE_URL>`
 
-### Environment Variable
+### Query Parameter
 
-- `HIRINGCAFE_SEARCH_URL` (optional): URL opened by Playwright before capturing `/api/search-jobs`.
-- If not set, the service uses the existing default search URL currently hardcoded in `app.py`.
+- `search_url` (required): URL opened by Playwright before capturing `/api/search-jobs`.
+
+### Build the `search_url` from Hiring Cafe
+
+1. Open `https://hiring.cafe/` in your browser.
+2. Set your filters (role, location, compensation, remote, date range, etc.).
+3. Copy the full URL from the browser address bar after filters are applied.
+4. URL-encode that copied URL.
+5. Pass the encoded value as `search_url` to this service.
 
 Example:
 
 ```text
-GET http://localhost:8000/jobs/hiringcafe
+GET http://localhost:8000/jobs/hiringcafe?search_url=https%3A%2F%2Fhiring.cafe%2F%3FsearchState%3D...
 ```
 
 Quick test:
 
 ```powershell
 Invoke-RestMethod -Uri "http://localhost:8000/health"
-Invoke-RestMethod -Uri "http://localhost:8000/jobs/hiringcafe"
+Invoke-RestMethod -Uri "http://localhost:8000/jobs/hiringcafe?search_url=https%3A%2F%2Fhiring.cafe%2F%3FsearchState%3D..."
 ```
 
 ## Response
 
 - Success: raw JSON from Hiring Cafe `/api/search-jobs`
 - Failure: `504` with error details if the expected API response is not captured in time
-
-## GitHub Setup
-
-This project is already initialized as a git repo. To commit and push updates:
-
-```powershell
-git add .
-git commit -m "Update README"
-```
-
-Connect to GitHub and push:
-
-```powershell
-git branch -M main
-git remote add origin <YOUR_GITHUB_REPO_URL>
-git push -u origin main
-```
 
 ## Troubleshooting
 
