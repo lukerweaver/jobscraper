@@ -1,3 +1,7 @@
+> **Maintenance note**
+> Because of recent changes by Hiring Cafe to prevent botting, this repository is no longer being maintained.
+> For an updated solution, use [n8n-job-funnel](https://github.com/lukerweaver/n8n-job-funnel).
+
 # Job Scraper Service
 
 Lightweight FastAPI service that uses Playwright to fetch job-search JSON from Hiring Cafe.
